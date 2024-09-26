@@ -19,8 +19,7 @@ OUTDIR="$(pwd)/pico"
 # Install dependencies
 GIT_DEPS="git"
 SDK_DEPS="cmake gcc-arm-none-eabi gcc g++"
-OPENOCD_DEPS="gdb-multiarch automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev"
-VSCODE_DEPS="code"
+OPENOCD_DEPS="gdb-multiarch automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev pkg-config libhidapi-dev libjaylink-dev"
 UART_DEPS="minicom"
 
 # Build full list of dependencies
@@ -130,7 +129,7 @@ else
     # Build OpenOCD
     echo "Building OpenOCD"
     cd $OUTDIR
-    OPENOCD_CONFIGURE_ARGS="--enable-ftdi --enable-sysfsgpio --enable-bcm2835gpio --disable-werror"
+    OPENOCD_CONFIGURE_ARGS="--enable-ftdi --enable-stlink --enable-cmsis-dap-v2 --enable-cmsis-dap --enable-esp-usb-jtag --enable-jlink --disable-werror"
 
     git clone "${GITHUB_PREFIX}openocd${GITHUB_SUFFIX}" --depth=1
     cd openocd
@@ -141,13 +140,3 @@ else
 fi
 
 cd $OUTDIR
-
-# Enable UART
-if [[ "$SKIP_UART" == 1 ]]; then
-    echo "Skipping uart configuration"
-else
-    sudo apt install -y $UART_DEPS
-    echo "Disabling Linux serial console (UART) so we can use it for pico"
-    sudo raspi-config nonint do_serial 2
-    echo "You must run sudo reboot to finish UART setup"
-fi
